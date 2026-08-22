@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #ff5a1f;
+  --color-surface: #f4f4f5;
+  --color-ink: #18181b;
+
+  --radius-card: 12px;
+  --spacing-gutter: 20px;
+
+  --spacing-pixel: 16px;
+  --spacing-pixel-gap: 2px;
+
+  --font-display: "Inter", sans-serif;
+}

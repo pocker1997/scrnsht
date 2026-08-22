@@ -1,0 +1,567 @@
+.app-outer {
+  position: fixed;
+  inset: 0;
+  background: #eeeeee;
+}
+
+.canvas-area {
+  width: 100%;
+  height: 100%;
+  background: #eeeeee;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.canvas-content {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.stage-image {
+  position: absolute;
+  display: block;
+}
+
+.hover-cursor {
+  position: absolute;
+  display: flex;
+  pointer-events: none;
+}
+
+.empty-state {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 508px;
+  max-width: calc(100% - 48px);
+  max-height: calc(100% - 48px);
+  padding: 50px 70px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.empty-state:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: -2px;
+}
+
+.empty-state__text {
+  margin: 0;
+  max-width: 368px;
+  font-family: 'Shantell Sans', cursive;
+  font-weight: 600;
+  font-size: clamp(16px, 5vw, 24px);
+  line-height: normal;
+  color: #111111;
+  text-align: center;
+}
+
+.selection-badge {
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Geist', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.selection-badge--interactive {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.selection-badge--interactive:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: 2px;
+}
+
+.selection-box {
+  position: absolute;
+  box-sizing: border-box;
+  border: 4px solid #111111;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.selection-mask {
+  position: absolute;
+  box-sizing: border-box;
+  border-width: 4px;
+  border-style: solid;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.annotation-panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  z-index: 20;
+}
+
+.annotation-panel__input {
+  width: 100%;
+  min-height: 22px;
+  overflow: hidden;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'Shantell Sans', cursive;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 22px;
+  color: #ffffff;
+  caret-color: #ffffff;
+}
+
+.annotation-panel__input::placeholder {
+  color: #888888;
+}
+
+.annotation-panel__note-text {
+  margin: 0;
+  width: 100%;
+  font-family: 'Shantell Sans', cursive;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 22px;
+  color: #ffffff;
+  white-space: pre-wrap;
+  animation: annotation-note-fade-in 200ms ease;
+}
+
+@keyframes annotation-note-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.annotation-viewer-mask {
+  position: absolute;
+  box-sizing: border-box;
+  border-width: 4px;
+  border-style: solid;
+  pointer-events: none;
+  z-index: 10;
+  transition:
+    left 200ms ease,
+    top 200ms ease,
+    width 200ms ease,
+    height 200ms ease;
+}
+
+.annotation-viewer__counter {
+  position: absolute;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 15;
+  font-family: 'Geist', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.annotation-toolbar-row {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: stretch;
+  z-index: 30;
+}
+
+.annotation-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 44px;
+  height: 60px;
+  padding: 0 4px 0 24px;
+  background: #ffffff;
+}
+
+.annotation-toolbar__section {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.annotation-toolbar__label {
+  font-family: 'Geist', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+.annotation-toolbar__swatches {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.annotation-swatch {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.annotation-swatch__fill {
+  position: absolute;
+  inset: 16.67%;
+}
+
+.annotation-swatch__fill--white {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.annotation-swatch__ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #111111;
+  pointer-events: none;
+}
+
+.annotation-swatch:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: 2px;
+}
+
+.annotation-toolbar__divider {
+  width: 1px;
+  height: 24px;
+  background: #d9d9d9;
+}
+
+.annotation-toolbar__nav {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.annotation-toolbar__nav:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: -2px;
+}
+
+.annotation-toolbar__stickers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.annotation-sticker {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.annotation-toolbar__done {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 60px;
+  padding: 18px 20px 18px 24px;
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  font-family: 'Geist', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.annotation-actions {
+  display: flex;
+  align-items: center;
+}
+
+.annotation-actions__divider {
+  width: 1px;
+  height: 24px;
+  background: #d9d9d9;
+}
+
+.annotation-close {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.annotation-close:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: -4px;
+}
+
+.hold-delete {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hold-delete--hint {
+  background: #ffffff;
+}
+
+.hold-delete--toolbar {
+  width: 60px;
+  height: 60px;
+  background: transparent;
+}
+
+.hold-delete--hint:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: -2px;
+}
+
+.hold-delete--toolbar:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: -4px;
+}
+
+.hold-delete__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: #ff4f4f;
+  pointer-events: none;
+}
+
+.hold-delete__icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.annotation-badge-zone {
+  position: absolute;
+  display: flex;
+  z-index: 5;
+}
+
+.tab-bar {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  z-index: 8;
+}
+
+.tab-row {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+.tab-row__label {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0 24px;
+  background: #ffffff;
+  color: #111111;
+  border: none;
+  font-family: 'Geist', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* a flex container's own bare text can't shrink below its content width (its anonymous
+   flex item has no overflow to trigger the automatic-minimum-size:0 rule), so ellipsis
+   silently fails unless the truncated text lives in its own shrinkable child */
+.tab-row__label-text {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-row__label--active {
+  background: #111111;
+  color: #ffffff;
+}
+
+.tab-row__label:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: -2px;
+}
+
+.tab-row__label--active:focus-visible {
+  outline-color: #ffffff;
+}
+
+.tab-bar__add {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #111111;
+  border: none;
+  font-family: 'Geist', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tab-bar__add:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: -2px;
+}
+
+.share-button {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 40;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 60px;
+  padding: 18px 20px 18px 24px;
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  font-family: 'Geist', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.share-button:disabled {
+  cursor: default;
+}
+
+.share-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: -4px;
+}
+
+.share-button__fill {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.04);
+  transition: width 3000ms linear;
+  pointer-events: none;
+}
+
+.share-button__content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.share-button__label {
+  white-space: nowrap;
+}
+
+.start-view-button {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 40;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 60px;
+  padding: 18px 20px 18px 24px;
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  font-family: 'Geist', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.start-view-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: -4px;
+}
+
+.shared-empty {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eeeeee;
+  font-family: 'Geist', system-ui, sans-serif;
+  font-size: 16px;
+  color: #6c6c6f;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
