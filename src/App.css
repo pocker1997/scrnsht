@@ -267,6 +267,11 @@
   background: #d9d9d9;
 }
 
+.annotation-toolbar__nav-group {
+  display: flex;
+  align-items: center;
+}
+
 .annotation-toolbar__nav {
   width: 60px;
   height: 60px;

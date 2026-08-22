@@ -5,6 +5,7 @@ import { ANNOTATION_COLORS } from '../lib/annotationColors.js'
 import { fractionToPoint, fractionToRect } from '../lib/grid.js'
 import useElementSize from '../hooks/useElementSize.js'
 import useImageLayout from '../hooks/useImageLayout.js'
+import DotGrid from './DotGrid.jsx'
 import SelectionBadge from './SelectionBadge.jsx'
 
 const PANEL_WIDTH = 340
@@ -88,6 +89,8 @@ export default function AnnotationViewer({ image, annotations, onClose }) {
     <div className="app-outer">
       <div className="canvas-area" ref={viewportRef}>
         <div className="canvas-content" style={{ height: sized.contentHeight }}>
+          <DotGrid width={viewport.width} height={sized.contentHeight} />
+
           <img
             className="stage-image"
             src={image.url}
@@ -142,10 +145,12 @@ export default function AnnotationViewer({ image, annotations, onClose }) {
 
       <div className="annotation-toolbar-row">
         <div className="annotation-toolbar annotation-toolbar--viewer">
-          <button type="button" className="annotation-toolbar__nav" onClick={goPrev} aria-label="Previous annotation">
-            <ArrowLeftIcon />
-          </button>
-          <div className="annotation-toolbar__divider" />
+          <div className="annotation-toolbar__nav-group">
+            <button type="button" className="annotation-toolbar__nav" onClick={goPrev} aria-label="Previous annotation">
+              <ArrowLeftIcon />
+            </button>
+            <div className="annotation-toolbar__divider" />
+          </div>
           <div className="annotation-toolbar__section">
             <span className="annotation-toolbar__label">Reactions</span>
             <div className="annotation-toolbar__stickers">
@@ -153,10 +158,12 @@ export default function AnnotationViewer({ image, annotations, onClose }) {
               <img src={catSticker} alt="" className="annotation-sticker" />
             </div>
           </div>
-          <div className="annotation-toolbar__divider" />
-          <button type="button" className="annotation-toolbar__nav" onClick={goNext} aria-label="Next annotation">
-            <ArrowRightIcon />
-          </button>
+          <div className="annotation-toolbar__nav-group">
+            <div className="annotation-toolbar__divider" />
+            <button type="button" className="annotation-toolbar__nav" onClick={goNext} aria-label="Next annotation">
+              <ArrowRightIcon />
+            </button>
+          </div>
         </div>
         <div className="annotation-actions">
           <button type="button" className="annotation-close" onClick={onClose} aria-label="Close">
