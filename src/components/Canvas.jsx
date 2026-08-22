@@ -418,7 +418,7 @@ export default function Canvas({
             style={{ left: gridX.margin, top: gridY.margin }}
           />
 
-          {image && <ShareButton onShare={handleShareClick} />}
+          {image && <ShareButton onShare={handleShareClick} style={{ right: gridX.margin, top: gridY.margin }} />}
 
           {image && layout ? (
             <img

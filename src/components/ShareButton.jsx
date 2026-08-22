@@ -23,7 +23,7 @@ function CheckIcon() {
 
 // idle -> click copies the link, then a disabled "sharing" state for SHARE_DURATION_MS with a
 // right-to-left progress fill (4%-opacity overlay) before reverting to idle automatically
-export default function ShareButton({ onShare }) {
+export default function ShareButton({ onShare, style }) {
   const [sharing, setSharing] = useState(false)
   const [filled, setFilled] = useState(false)
   const timeoutRef = useRef(null)
@@ -50,7 +50,7 @@ export default function ShareButton({ onShare }) {
   }
 
   return (
-    <button type="button" className="share-button" onClick={handleClick} disabled={sharing}>
+    <button type="button" className="share-button" style={style} onClick={handleClick} disabled={sharing}>
       <div className="share-button__fill" style={{ width: filled ? '100%' : '0%' }} />
       <span className="share-button__content">
         <span className="share-button__label">{sharing ? 'COPIED!' : 'SHARE'}</span>

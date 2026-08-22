@@ -1,4 +1,4 @@
-import { fractionToPoint } from '../lib/grid.js'
+import { axisMetrics, fractionToPoint } from '../lib/grid.js'
 import useElementSize from '../hooks/useElementSize.js'
 import useImageLayout from '../hooks/useImageLayout.js'
 import DotGrid from './DotGrid.jsx'
@@ -16,6 +16,8 @@ function PlayIcon() {
 export default function SharedLanding({ image, annotations, onStartView }) {
   const [viewportRef, viewport] = useElementSize()
   const sized = useImageLayout(viewport, image)
+  const gridX = axisMetrics(viewport.width)
+  const gridY = axisMetrics(sized?.contentHeight || viewport.height)
 
   return (
     <div className="app-outer">
@@ -47,15 +49,20 @@ export default function SharedLanding({ image, annotations, onStartView }) {
                 />
               )
             })}
+
+          {annotations.length > 0 && (
+            <button
+              type="button"
+              className="start-view-button"
+              style={{ right: gridX.margin, top: gridY.margin }}
+              onClick={onStartView}
+            >
+              START VIEW
+              <PlayIcon />
+            </button>
+          )}
         </div>
       </div>
-
-      {annotations.length > 0 && (
-        <button type="button" className="start-view-button" onClick={onStartView}>
-          START VIEW
-          <PlayIcon />
-        </button>
-      )}
     </div>
   )
 }
