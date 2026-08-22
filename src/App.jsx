@@ -1,10 +1,14 @@
-import { useCallback, useState } from 'react'
+import { Suspense, lazy, useCallback, useState } from 'react'
 import Canvas from './components/Canvas.jsx'
 import TokenPanel from './components/TokenPanel.jsx'
-import { Agentation } from 'agentation'
 import { createShare } from './lib/share.js'
 import { createTab, nameFromFile } from './lib/tabs.js'
 import './App.css'
+
+// dynamically imported so its ~600kB bundle only ships to browsers that actually use it
+// (dev, or an explicit ?agentation=1 opt-in) instead of every production visitor
+const Agentation = lazy(() => import('agentation').then((m) => ({ default: m.Agentation })))
+const showAgentation = import.meta.env.DEV || new URLSearchParams(window.location.search).get('agentation') === '1'
 
 function App() {
   const [tabs, setTabs] = useState(() => [createTab()])
@@ -91,7 +95,13 @@ function App() {
       />
 
       {import.meta.env.DEV && <TokenPanel />}
-      {import.meta.env.DEV && <Agentation endpoint="http://localhost:4747" />}
+      {/* dev: always on. prod: opt-in via ?agentation=1, since the endpoint is localhost —
+          only useful when the page is opened on the same machine as a running agent session */}
+      {showAgentation && (
+        <Suspense fallback={null}>
+          <Agentation endpoint="http://localhost:4747" />
+        </Suspense>
+      )}
     </>
   )
 }
