@@ -11,15 +11,17 @@ function PlusIcon() {
 }
 
 // active tab only: hovering it for HOVER_REVEAL_MS reveals a hold-to-delete button flush
-// against its right edge, same reveal→hold pattern as an annotation badge's delete hint
-function TabRow({ tab, active, onSelect, onDelete }) {
+// against its right edge, same reveal→hold pattern as an annotation badge's delete hint.
+// canDelete is false when this is the last remaining tab — deletion isn't allowed there,
+// so the hint never appears (nothing to hold-to-confirm).
+function TabRow({ tab, active, canDelete, onSelect, onDelete }) {
   const [hintVisible, setHintVisible] = useState(false)
   const timerRef = useRef(null)
 
   useEffect(() => () => clearTimeout(timerRef.current), [])
 
   const handleEnter = () => {
-    if (!active) return
+    if (!active || !canDelete) return
     timerRef.current = setTimeout(() => setHintVisible(true), HOVER_REVEAL_MS)
   }
   const handleLeave = () => {
@@ -38,7 +40,7 @@ function TabRow({ tab, active, onSelect, onDelete }) {
       >
         <span className="tab-row__label-text">{tab.name}</span>
       </button>
-      {active && hintVisible && (
+      {active && canDelete && hintVisible && (
         <HoldToDeleteButton
           variant="hint"
           onConfirm={onDelete}
@@ -51,6 +53,8 @@ function TabRow({ tab, active, onSelect, onDelete }) {
 }
 
 export default function TabBar({ tabs, activeTabId, onSelect, onAdd, onDelete, style }) {
+  const canDelete = tabs.length > 1
+
   return (
     <div className="tab-bar" style={style}>
       {tabs.map((tab) => (
@@ -58,6 +62,7 @@ export default function TabBar({ tabs, activeTabId, onSelect, onAdd, onDelete, s
           key={tab.id}
           tab={tab}
           active={tab.id === activeTabId}
+          canDelete={canDelete}
           onSelect={() => onSelect(tab.id)}
           onDelete={() => onDelete(tab.id)}
         />

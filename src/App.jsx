@@ -1,6 +1,7 @@
-import { Suspense, lazy, useCallback, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
 import Canvas from './components/Canvas.jsx'
 import TokenPanel from './components/TokenPanel.jsx'
+import { deleteTab as deleteStoredTab, loadAllTabs, saveTab } from './lib/db.js'
 import { createShare } from './lib/share.js'
 import { createTab, nameFromFile } from './lib/tabs.js'
 import './App.css'
@@ -11,10 +12,36 @@ const Agentation = lazy(() => import('agentation').then((m) => ({ default: m.Age
 const showAgentation = import.meta.env.DEV || new URLSearchParams(window.location.search).get('agentation') === '1'
 
 function App() {
-  const [tabs, setTabs] = useState(() => [createTab()])
-  const [activeTabId, setActiveTabId] = useState(tabs[0].id)
+  const [tabs, setTabs] = useState(null)
+  const [activeTabId, setActiveTabId] = useState(null)
 
-  const activeTab = tabs.find((t) => t.id === activeTabId)
+  // hydrate from IndexedDB once on mount — tabs persist across reloads until explicitly
+  // deleted, rather than resetting to a blank tab every time
+  useEffect(() => {
+    let cancelled = false
+    loadAllTabs().then((saved) => {
+      if (cancelled) return
+      if (saved.length === 0) {
+        const tab = createTab()
+        setTabs([tab])
+        setActiveTabId(tab.id)
+        return
+      }
+      const hydrated = saved.map((t) => ({
+        id: t.id,
+        name: t.name,
+        annotations: t.annotations,
+        image: t.image ? { url: URL.createObjectURL(t.image.blob), width: t.image.width, height: t.image.height, blob: t.image.blob } : null,
+      }))
+      setTabs(hydrated)
+      setActiveTabId(hydrated[0].id)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const activeTab = tabs?.find((t) => t.id === activeTabId)
 
   const handleImage = useCallback(
     (file) => {
@@ -26,7 +53,9 @@ function App() {
           prev.map((t) => {
             if (t.id !== activeTabId) return t
             if (t.image) URL.revokeObjectURL(t.image.url)
-            return { ...t, name, image: { url, width: probe.naturalWidth, height: probe.naturalHeight } }
+            const image = { url, width: probe.naturalWidth, height: probe.naturalHeight, blob: file }
+            saveTab({ id: t.id, name, annotations: t.annotations, image: { blob: file, width: image.width, height: image.height } })
+            return { ...t, name, image }
           }),
         )
       }
@@ -38,9 +67,17 @@ function App() {
   const handleAnnotationsChange = useCallback(
     (updater) => {
       setTabs((prev) =>
-        prev.map((t) =>
-          t.id === activeTabId ? { ...t, annotations: typeof updater === 'function' ? updater(t.annotations) : updater } : t,
-        ),
+        prev.map((t) => {
+          if (t.id !== activeTabId) return t
+          const annotations = typeof updater === 'function' ? updater(t.annotations) : updater
+          saveTab({
+            id: t.id,
+            name: t.name,
+            annotations,
+            image: t.image ? { blob: t.image.blob, width: t.image.width, height: t.image.height } : null,
+          })
+          return { ...t, annotations }
+        }),
       )
     },
     [activeTabId],
@@ -56,6 +93,7 @@ function App() {
 
   const handleAddTab = useCallback(() => {
     const tab = createTab()
+    saveTab({ id: tab.id, name: tab.name, annotations: tab.annotations, image: null })
     setTabs((prev) => [...prev, tab])
     setActiveTabId(tab.id)
   }, [])
@@ -68,6 +106,7 @@ function App() {
         if (index === -1) return prev
         const deleted = prev[index]
         if (deleted.image) URL.revokeObjectURL(deleted.image.url)
+        deleteStoredTab(id)
         const next = prev.filter((t) => t.id !== id)
         if (id === activeTabId) {
           const neighbor = next[index] ?? next[index - 1]
@@ -78,6 +117,8 @@ function App() {
     },
     [activeTabId],
   )
+
+  if (!tabs || !activeTab) return null
 
   return (
     <>
