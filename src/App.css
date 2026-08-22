@@ -200,8 +200,14 @@
   align-items: center;
   gap: 44px;
   height: 60px;
-  padding: 0 4px 0 24px;
+  padding-left: 24px;
   background: #ffffff;
+}
+
+/* the viewer's toolbar ends in a nav button (no built-in right padding of its own, unlike
+   the editor's DONE button), so it needs a little breathing room before the row's edge */
+.annotation-toolbar--viewer {
+  padding-right: 4px;
 }
 
 .annotation-toolbar__section {

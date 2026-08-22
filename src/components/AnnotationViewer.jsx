@@ -141,7 +141,7 @@ export default function AnnotationViewer({ image, annotations, onClose }) {
       </div>
 
       <div className="annotation-toolbar-row">
-        <div className="annotation-toolbar">
+        <div className="annotation-toolbar annotation-toolbar--viewer">
           <button type="button" className="annotation-toolbar__nav" onClick={goPrev} aria-label="Previous annotation">
             <ArrowLeftIcon />
           </button>
